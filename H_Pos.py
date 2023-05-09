@@ -7,7 +7,7 @@ def hierarchy_pos(G, root=None, width=1., vert_gap = 0.2, vert_loc = 0, xcenter 
 
     if root is None:
         if isinstance(G, nx.DiGraph):
-            root = next(iter(nx.topological_sort(G)))  #allows back compatibility with nx version 1.11
+            root = next(iter(nx.topological_sort(G)))
         else:
             root = random.choice(list(G.nodes))
             
