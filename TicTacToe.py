@@ -124,16 +124,15 @@ while running:
                 winner = check_game_over()
                 if winner:
                     running = False
-                
-                # ai turn
-                ai_turn()
+                else:
+                    # ai turn
+                    ai_turn()
 
-                # check if game is over before human plays
-                winner = check_game_over()
-                if winner:
-                    running = False
-                
-                
+                    # check if game is over before human plays
+                    winner = check_game_over()
+                    if winner:
+                        running = False
+          
     # Draw the board
     draw_board()
 
