@@ -58,12 +58,14 @@ def ai_turn():
     best_score = -20000
     best_move_i = -1
     best_move_j = -1
+    alpha = -float('inf')
+    beta = float('inf')
     
     for i in range(3):
         for j in range(3):
             if board[i][j] == "":
                 board[i][j] = "O"
-                score = minimax(0, False)
+                score = minimax(0, False, alpha, beta)
                 board[i][j] = ""
                 if score > best_score:
                     best_score = score
@@ -72,7 +74,8 @@ def ai_turn():
     
     board[best_move_i][best_move_j] = "O"
 
-def minimax(depth, isMax):
+
+def minimax(depth, isMax, alpha, beta):
     # check if game would be over in predicted move
     result = check_game_over()
     if result == "Tie":
@@ -88,10 +91,13 @@ def minimax(depth, isMax):
             for j in range(3):
                 if board[i][j] == "":
                     board[i][j] = "O"
-                    score = minimax(depth + 1, False)
+                    score = minimax(depth + 1, False, alpha, beta)
                     # revert predicted move
                     board[i][j] = ""
                     best_score = max(score, best_score)
+                    alpha = max(alpha, score)  # update the alpha value
+                    if beta <= alpha:
+                        return best_score  # beta cut-off
         return best_score
     else:
         best_score = 20000
@@ -99,10 +105,14 @@ def minimax(depth, isMax):
             for j in range(3):
                 if board[i][j] == "":
                     board[i][j] = "X"
-                    score = minimax(depth + 1, True)
+                    score = minimax(depth + 1, True, alpha, beta)
                     board[i][j] = ""
                     best_score = min(score, best_score)
+                    beta = min(beta, score)  # update the beta value
+                    if beta <= alpha:
+                        return best_score  # alpha cut-off
         return best_score
+
          
 # Main game loop
 running = True
@@ -115,6 +125,7 @@ while running:
             # Handle mouse click events
             x, y = event.pos
             i, j = x // 100, y // 100
+
 
             # human turn
             if board[j][i] == "":
