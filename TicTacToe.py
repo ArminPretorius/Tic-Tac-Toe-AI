@@ -1,6 +1,6 @@
 import pygame
 import time
-import random
+#import random (Does not seem to be used)
 
 # Initialize Pygame
 pygame.init()
@@ -27,20 +27,20 @@ board = [["", "", ""], ["", "", ""], ["", "", ""]]
 # Draw the Tic Tac Toe board
 def draw_board():
     screen.fill(WHITE)
-    for i in range(3):
+    for i in range(3): 
         for j in range(3):
-            pygame.draw.rect(screen, BLACK, (i*100, j*100, 100, 100), 2)
-            text = font.render(board[j][i], True, BLACK)
-            screen.blit(text, (i*100+30, j*100+15))
+            pygame.draw.rect(screen, BLACK, (i*100, j*100, 100, 100), 2) 
+            text = font.render(board[j][i], True, BLACK) 
+            screen.blit(text, (i*100+30, j*100+15)) 
 
 # Check if the game is over
 def check_game_over():
     #global game_over
-    for i in range(3):
-        if board[i][0] == board[i][1] == board[i][2] != "":
+    for i in range(3): 
+        if board[i][0] == board[i][1] == board[i][2] != "": 
             #game_over = True
             return board[i][0]
-        if board[0][i] == board[1][i] == board[2][i] != "":
+        if board[0][i] == board[1][i] == board[2][i] != "": 
             #game_over = True
             return board[0][i]
     if board[0][0] == board[1][1] == board[2][2] != "":
@@ -76,7 +76,6 @@ def ai_turn():
 
 
 def minimax(depth, isMax, alpha, beta):
-    # check if game would be over in predicted move
     result = check_game_over()
     if result == "Tie":
         return 0
@@ -92,12 +91,11 @@ def minimax(depth, isMax, alpha, beta):
                 if board[i][j] == "":
                     board[i][j] = "O"
                     score = minimax(depth + 1, False, alpha, beta)
-                    # revert predicted move
                     board[i][j] = ""
                     best_score = max(score, best_score)
-                    alpha = max(alpha, score)  # update the alpha value
+                    alpha = max(alpha, score)
                     if beta <= alpha:
-                        return best_score  # beta cut-off
+                        break
         return best_score
     else:
         best_score = 20000
@@ -108,10 +106,11 @@ def minimax(depth, isMax, alpha, beta):
                     score = minimax(depth + 1, True, alpha, beta)
                     board[i][j] = ""
                     best_score = min(score, best_score)
-                    beta = min(beta, score)  # update the beta value
+                    beta = min(beta, score)
                     if beta <= alpha:
-                        return best_score  # alpha cut-off
+                        break
         return best_score
+
 
          
 # Main game loop
