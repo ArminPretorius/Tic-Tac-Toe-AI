@@ -1,5 +1,8 @@
 import pygame
 import time
+import networkx as nx
+import matplotlib.pyplot as plt
+from networkx.drawing.nx_pydot import graphviz_layout #pip install graphviz
 #import random (Does not seem to be used)
 
 # Initialize Pygame
@@ -23,6 +26,9 @@ font = pygame.font.Font(None, 80)
 # Initialize the game variables
 player = "X"
 board = [["", "", ""], ["", "", ""], ["", "", ""]]
+
+#Initialize graph
+graph = nx.DiGraph()
 
 # Draw the Tic Tac Toe board
 def draw_board():
@@ -65,7 +71,8 @@ def ai_turn():
         for j in range(3):
             if board[i][j] == "":
                 board[i][j] = "O"
-                score = minimax(0, False, alpha, beta)
+                graph.add_node("Start")
+                score = minimax(0, False, alpha, beta, 0, 0)
                 board[i][j] = ""
                 if score > best_score:
                     best_score = score
@@ -74,8 +81,15 @@ def ai_turn():
     
     board[best_move_i][best_move_j] = "O"
 
+    #Layout and drawing of graph
+    pos = graphviz_layout(graph, prog="dot")
+    nx.draw(graph, pos)
+    nx.draw_networkx_labels(graph, pos, labels={node: node for node in graph.nodes()})
+    plt.show()
+    graph.clear()
 
-def minimax(depth, isMax, alpha, beta):
+
+def minimax(depth, isMax, alpha, beta, prvi, prvj):
     result = check_game_over()
     if result == "Tie":
         return 0
@@ -90,7 +104,12 @@ def minimax(depth, isMax, alpha, beta):
             for j in range(3):
                 if board[i][j] == "":
                     board[i][j] = "O"
-                    score = minimax(depth + 1, False, alpha, beta)
+                    score = minimax(depth + 1, False, alpha, beta, i, j)
+                    #Adding nodes and edges to graph
+                    if depth == 0:
+                        graph.add_edge("Start", f"({i},{j})")
+                    else:
+                        graph.add_edge(f"{depth-1} ({prvi},{prvj})", f"{depth} ({i},{j})")
                     board[i][j] = ""
                     best_score = max(score, best_score)
                     alpha = max(alpha, score)
@@ -103,15 +122,18 @@ def minimax(depth, isMax, alpha, beta):
             for j in range(3):
                 if board[i][j] == "":
                     board[i][j] = "X"
-                    score = minimax(depth + 1, True, alpha, beta)
+                    score = minimax(depth + 1, True, alpha, beta, i, j)
+                    #Adding nodes and edges to graph
+                    if depth == 0:
+                        graph.add_edge("Start", f"{depth} ({i},{j})")
+                    else:
+                        graph.add_edge(f"{depth-1} ({prvi},{prvj})", f"{depth} ({i},{j})")
                     board[i][j] = ""
                     best_score = min(score, best_score)
                     beta = min(beta, score)
                     if beta <= alpha:
                         break
         return best_score
-
-
          
 # Main game loop
 running = True
