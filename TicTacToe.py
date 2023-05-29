@@ -2,8 +2,9 @@ import pygame
 import time
 import networkx as nx
 import matplotlib.pyplot as plt
-from networkx.drawing.nx_pydot import graphviz_layout #pip install graphviz
-#import random (Does not seem to be used)
+from networkx.drawing.nx_pydot import graphviz_layout
+
+ENABLE_GRAPH = True
 
 # Initialize Pygame
 pygame.init()
@@ -38,6 +39,10 @@ def draw_board():
             pygame.draw.rect(screen, BLACK, (i*100, j*100, 100, 100), 2) 
             text = font.render(board[j][i], True, BLACK) 
             screen.blit(text, (i*100+30, j*100+15)) 
+    #draw toggle button
+    pygame.draw.rect(screen, GRAY, (0, 300, 300, 100), 0)
+    text = font.render("Toggle", True, BLACK)
+    screen.blit(text, (100, 320))
 
 # Check if the game is over
 def check_game_over():
@@ -80,14 +85,14 @@ def ai_turn():
                     best_move_j = j
     
     board[best_move_i][best_move_j] = "O"
-
-    #Layout and drawing of graph
-    pos = graphviz_layout(graph, prog="dot")
-    nx.draw(graph, pos)
-    nx.draw_networkx_labels(graph, pos, labels={node: node for node in graph.nodes()})
-    plt.show()
-    graph.clear()
-
+    #update graph
+    if ENABLE_GRAPH == True:
+        plt.clf()
+        pos = graphviz_layout(graph, prog="dot")
+        nx.draw(graph, pos, with_labels=True, node_size=1500, edge_color="black")
+        nx.draw_networkx_labels(graph, pos, labels={node: node for node in graph.nodes()})
+        plt.pause(0.1)
+        graph.clear()
 
 def minimax(depth, isMax, alpha, beta, prvi, prvj):
     result = check_game_over()
@@ -106,10 +111,11 @@ def minimax(depth, isMax, alpha, beta, prvi, prvj):
                     board[i][j] = "O"
                     score = minimax(depth + 1, False, alpha, beta, i, j)
                     #Adding nodes and edges to graph
-                    if depth == 0:
-                        graph.add_edge("Start", f"({i},{j})")
-                    else:
-                        graph.add_edge(f"{depth-1} ({prvi},{prvj})", f"{depth} ({i},{j})")
+                    if ENABLE_GRAPH == True:
+                        if depth == 0:
+                            graph.add_edge("Start", f"({i},{j})")
+                        else:
+                            graph.add_edge(f"{depth-1} ({prvi},{prvj})", f"{depth} ({i},{j})")
                     board[i][j] = ""
                     best_score = max(score, best_score)
                     alpha = max(alpha, score)
@@ -124,10 +130,11 @@ def minimax(depth, isMax, alpha, beta, prvi, prvj):
                     board[i][j] = "X"
                     score = minimax(depth + 1, True, alpha, beta, i, j)
                     #Adding nodes and edges to graph
-                    if depth == 0:
-                        graph.add_edge("Start", f"{depth} ({i},{j})")
-                    else:
-                        graph.add_edge(f"{depth-1} ({prvi},{prvj})", f"{depth} ({i},{j})")
+                    if ENABLE_GRAPH == True:
+                        if depth == 0:
+                            graph.add_edge("Start", f"{depth} ({i},{j})")
+                        else:
+                            graph.add_edge(f"{depth-1} ({prvi},{prvj})", f"{depth} ({i},{j})")
                     board[i][j] = ""
                     best_score = min(score, best_score)
                     beta = min(beta, score)
@@ -147,23 +154,24 @@ while running:
             x, y = event.pos
             i, j = x // 100, y // 100
 
-
-            # human turn
-            if board[j][i] == "":
-                board[j][i] = "X"
-                
-                # check if game is over before ai plays
-                winner = check_game_over()
-                if winner:
-                    running = False
-                else:
-                    # ai turn
-                    ai_turn()
-
-                    # check if game is over before human plays
+            # Check if the click is within the board boundaries
+            if 0 <= i < 3 and 0 <= j < 3:
+                # human turn
+                if board[j][i] == "":
+                    board[j][i] = "X"
+                    
+                    # check if game is over before ai plays
                     winner = check_game_over()
                     if winner:
                         running = False
+                    else:
+                        # ai turn
+                        ai_turn()
+
+                        # check if game is over before human plays
+                        winner = check_game_over()
+                        if winner:
+                            running = False
           
     # Draw the board
     draw_board()
@@ -185,4 +193,3 @@ time.sleep(3)
 
 # Quit Pygame
 pygame.quit()
-
