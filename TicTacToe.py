@@ -65,7 +65,7 @@ def check_game_over():
         return "Tie"
 
 def ai_turn(): 
-    best_score = -20000
+    best_score = -float('inf')
     best_move_i = -1
     best_move_j = -1
     alpha = -float('inf')
