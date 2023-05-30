@@ -64,7 +64,6 @@ def check_game_over():
         #game_over = True
         return "Tie"
 
-# ctrl + / to comment
 def ai_turn(): 
     best_score = -20000
     best_move_i = -1
@@ -85,7 +84,7 @@ def ai_turn():
                     best_move_j = j
     
     board[best_move_i][best_move_j] = "O"
-    #update graph
+    #update graph if graph is enabled
     if ENABLE_GRAPH == True:
         plt.clf()
         pos = graphviz_layout(graph, prog="dot")
@@ -104,13 +103,13 @@ def minimax(depth, isMax, alpha, beta, prvi, prvj):
         return 1
 
     if isMax:
-        best_score = -20000
+        best_score = -float('inf')
         for i in range(3):
             for j in range(3):
                 if board[i][j] == "":
                     board[i][j] = "O"
                     score = minimax(depth + 1, False, alpha, beta, i, j)
-                    #Adding nodes and edges to graph
+                    #Adding nodes and edges to graph if enabled
                     if ENABLE_GRAPH == True:
                         if depth == 0:
                             graph.add_edge("Start", f"({i},{j})")
@@ -123,13 +122,13 @@ def minimax(depth, isMax, alpha, beta, prvi, prvj):
                         break
         return best_score
     else:
-        best_score = 20000
+        best_score = float('inf')
         for i in range(3):
             for j in range(3):
                 if board[i][j] == "":
                     board[i][j] = "X"
                     score = minimax(depth + 1, True, alpha, beta, i, j)
-                    #Adding nodes and edges to graph
+                    #Adding nodes and edges to graph if enabled
                     if ENABLE_GRAPH == True:
                         if depth == 0:
                             graph.add_edge("Start", f"{depth} ({i},{j})")
