@@ -46,22 +46,16 @@ def draw_board():
 
 # Check if the game is over
 def check_game_over():
-    #global game_over
     for i in range(3): 
         if board[i][0] == board[i][1] == board[i][2] != "": 
-            #game_over = True
             return board[i][0]
         if board[0][i] == board[1][i] == board[2][i] != "": 
-            #game_over = True
             return board[0][i]
     if board[0][0] == board[1][1] == board[2][2] != "":
-        #game_over = True
         return board[0][0]
     if board[0][2] == board[1][1] == board[2][0] != "":
-        #game_over = True
         return board[0][2]
     if all(board[i][j] != "" for i in range(3) for j in range(3)):
-        #game_over = True
         return "Tie"
 
 def ai_turn(): 
